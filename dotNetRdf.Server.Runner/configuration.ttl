@@ -1,5 +1,6 @@
 @prefix dnr: <http://www.dotnetrdf.org/configuration#> .
 
+# Define a SPARQL query endpoint at /query which uses the standard Leviathan query processor
 <dotnetrdf:/query> a dnr:HttpHandler ;
     dnr:type "VDS.RDF.Server.SparqlQueryEndpoint" ;
     dnr:queryProcessor [
@@ -9,6 +10,7 @@
     ]
 .
 
+# Define a SPARQL query endpoint at /pull which uses the experimental Pull query processor
 <dotnetrdf:/pull> a dnr:HttpHandler ;
     dnr:type "VDS.RDF.Server.SparqlQueryEndpoint" ;
     dnr:queryProcessor [
@@ -17,12 +19,16 @@
         dnr:usingStore _:store;
     ]
 .
+
+# Both query endpoints query against this triple store
 _:store a dnr:TripleStore ;
     dnr:type "VDS.RDF.TripleStore" ;
     dnr:usingGraph _:data ;
 .
 
+# The default graph in the triple store
 _:data a dnr:Graph ;
     dnr:type "VDS.RDF.Graph" ;
+    # Replace this file reference with a local RDF file to load for querying
     dnr:fromFile "/home/kal/Projects/bsbmtools-v0.2/dataset.nt" ;
 .

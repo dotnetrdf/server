@@ -1,20 +1,26 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.DependencyInjection;
 using VDS.RDF.Configuration;
-using VDS.RDF.Query;
+using VDS.RDF.Server.Services;
 
 namespace VDS.RDF.Server;
 
 public static class DotNetRdfExtensions
 {
+    public static void AddDotNetRdfServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<IRdfResponseWriter, RdfResponseWriter>();
+        serviceCollection.AddSingleton<ISparqlQueryService, SparqlQueryService>();
+    }
+
     /// <summary>
     /// Initialise a set of endpoints for the specified WebApplication from the RDF configuration file referenced
     /// by the app setting at `DotNetRdf.Configuration` (defaulting to a file named `configuration.ttl` at the
     /// ContentRoot of the WebApplication).
     /// </summary>
     /// <param name="app"></param>
-    public static void UseDotNetRdf(this WebApplication app)
+    public static void MapDotNetRdfEndpoints(this WebApplication app)
     {
         // Use the core configuration loader with the server configuration extensions
         ConfigurationLoader.AddObjectFactory(new ServerConfiguration());
@@ -45,17 +51,11 @@ public static class DotNetRdfExtensions
     }
 
     /// <summary>
-    /// Register a SPARQL query endpoint with a WebApplication
+    /// Load a service endpoint from the application configuration file and register it with the web application
     /// </summary>
-    /// <param name="app">The application to register the new endpoint with.</param>
-    /// <param name="path">The path in the app where the endpoint will be installed.</param>
-    /// <param name="sparqlQueryProcessor">The query processor used to handle incoming requests.</param>
-    public static void MapSparqlQueryEndpoint(this WebApplication app, string path, ISparqlQueryProcessor sparqlQueryProcessor)
-    {
-        var endpoint = new SparqlQueryEndpoint(path, sparqlQueryProcessor);
-        endpoint.Register(app);
-    }
-
+    /// <param name="app">The application to register the new endpoint with</param>
+    /// <param name="configGraph">The RDF graph that contains the application configuration</param>
+    /// <param name="serviceEndpointNode">The RDF node in <paramref name="configGraph"/> that defines the endpoint to be registered.</param>
     private static void MapServiceEndpoint(WebApplication app, Graph configGraph, INode serviceEndpointNode)
     {
         if (ConfigurationLoader.LoadObject(configGraph, serviceEndpointNode) is IServiceEndpoint serviceEndpoint)

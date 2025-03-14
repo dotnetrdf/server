@@ -1,13 +1,9 @@
-using System.Text;
-using AngleSharp.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
-using VDS.RDF.Parsing;
 using VDS.RDF.Query;
-using VDS.RDF.Writing;
+using VDS.RDF.Server.Services;
 
 namespace VDS.RDF.Server;
 
@@ -17,6 +13,7 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
 
     public void Register(WebApplication app)
     {
+        var sparqlService = app.Services.GetRequiredService<ISparqlQueryService>();
         app.MapGet(Path, async (ctx) =>
         {
             var query = ctx.Request.Query["query"];
@@ -29,7 +26,7 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
             }
 
             ctx.EnableSynchronousIO();
-            await ProcessQueryAsync(ctx, query[0]!, defaultGraphUri, namedGraphUri);
+            await sparqlService.ProcessQueryAsync(ctx, query[0]!, defaultGraphUri, namedGraphUri, queryProcessor);
         });
 
         app.MapPost(Path, async (ctx) =>
@@ -67,103 +64,8 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
                 return;
             }
             ctx.EnableSynchronousIO();
-            await ProcessQueryAsync(ctx, query, (StringValues)defaultGraphUris, (StringValues)namedGraphUris);
+            await sparqlService.ProcessQueryAsync(ctx, query, (StringValues)defaultGraphUris, (StringValues)namedGraphUris, queryProcessor);
         });
     }
 
-    private async Task ProcessQueryAsync(HttpContext ctx, string query, StringValues defaultGraphUri, StringValues namedGraphUri)
-    {
-        SparqlQuery parsedQuery;
-        try
-        {
-            var parser = new SparqlQueryParser();
-            parsedQuery = parser.ParseFromString(query);
-        }
-        catch (RdfException)
-        {
-            ctx.Response.StatusCode = 400;
-            return;
-        }
-
-        if (defaultGraphUri.Any())
-        {
-            parsedQuery.ClearDefaultGraphs();
-            foreach (var defaultGraphName in defaultGraphUri)
-            {
-                if (defaultGraphName != null)
-                {
-                    parsedQuery.AddDefaultGraph(new UriNode(new Uri(defaultGraphName)));
-                }
-            }
-        }
-
-        if (namedGraphUri.Any())
-        {
-            parsedQuery.ClearNamedGraphs();
-            foreach (var namedGraphName in namedGraphUri)
-            {
-                if (namedGraphName != null)
-                {
-                    parsedQuery.AddNamedGraph(new UriNode(new Uri(namedGraphName)));
-                }
-            }
-        }
-
-        try
-        {
-            var queryResult = await queryProcessor.ProcessQueryAsync(parsedQuery);
-            if (queryResult is SparqlResultSet resultSet)
-            {
-                var mimeTypeDef =  ctx.GetAcceptableMediaType(it => it.CanWriteSparqlResults);
-                if (!mimeTypeDef.HasValue)
-                {
-                    ctx.Response.StatusCode = 405;
-                    return;
-                }
-
-                ctx.Response.StatusCode = 200;
-                var resultsWriter = mimeTypeDef.Value.MimeTypeDefinition.GetSparqlResultsWriter();
-                var acceptHeaderMatch = mimeTypeDef.Value.MatchedMediaType;
-                ctx.Response.ContentType = acceptHeaderMatch.MediaType.Value;
-                await using var textWriter =
-                    new StreamWriter(ctx.Response.Body, acceptHeaderMatch.Encoding ?? Encoding.UTF8);
-                resultsWriter.Save(resultSet, textWriter);
-                textWriter.Close();
-                return;
-            }
-
-            if (queryResult is IGraph resultGraph)
-            {
-                var mimeTypeDef = ctx.GetAcceptableMediaType(it => it.CanWriteRdf);
-                if (!mimeTypeDef.HasValue)
-                {
-                    ctx.Response.StatusCode = 405;
-                    return;
-                }
-
-                var writerMimeType = mimeTypeDef.Value.MimeTypeDefinition;
-                var acceptHeaderMatch = mimeTypeDef.Value.MatchedMediaType;
-                var resultsWriter = writerMimeType.GetRdfWriter();
-                ctx.Response.StatusCode = 200;
-                ctx.Response.ContentType = acceptHeaderMatch.MediaType.Value;
-                await using var textWriter =
-                    new StreamWriter(ctx.Response.Body, acceptHeaderMatch.Encoding ?? Encoding.UTF8);
-                resultsWriter.Save(resultGraph, textWriter);
-                return;
-            }
-
-            // Unexpected type of query result
-            ctx.Response.StatusCode = 500;
-        }
-        catch (RdfQueryTimeoutException)
-        {
-            ctx.Response.StatusCode = 504;
-        }
-        catch (RdfException)
-        {
-            // Unexpected error processing query
-            ctx.Response.StatusCode = 500;
-        }
-
-    }
 }
