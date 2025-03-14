@@ -41,5 +41,6 @@ public class RdfResponseWriter: IRdfResponseWriter
         await using var textWriter =
             new StreamWriter(ctx.Response.Body, acceptHeaderMatch.Encoding ?? Encoding.UTF8);
         resultsWriter.Save(graph, textWriter);
+        textWriter.Close();
     }
 }

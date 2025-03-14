@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetRdf.Server.Runner", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetRdf.Server", "dotNetRdf.Server\dotNetRdf.Server.csproj", "{672A79FA-08B8-491E-AE51-7730312146E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetRdf.Server.Tests", "dotNetRdf.Server.Tests\dotNetRdf.Server.Tests.csproj", "{C01B0A2F-2A49-4925-AAF5-CB3C0FF62E12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{672A79FA-08B8-491E-AE51-7730312146E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{672A79FA-08B8-491E-AE51-7730312146E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{672A79FA-08B8-491E-AE51-7730312146E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C01B0A2F-2A49-4925-AAF5-CB3C0FF62E12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C01B0A2F-2A49-4925-AAF5-CB3C0FF62E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C01B0A2F-2A49-4925-AAF5-CB3C0FF62E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C01B0A2F-2A49-4925-AAF5-CB3C0FF62E12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
