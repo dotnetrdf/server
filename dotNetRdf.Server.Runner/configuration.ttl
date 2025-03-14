@@ -1,0 +1,28 @@
+@prefix dnr: <http://www.dotnetrdf.org/configuration#> .
+
+<dotnetrdf:/query> a dnr:HttpHandler ;
+    dnr:type "VDS.RDF.Server.SparqlQueryEndpoint" ;
+    dnr:queryProcessor [
+        a dnr:SparqlQueryProcessor ;
+        dnr:type "VDS.RDF.Query.LeviathanQueryProcessor" ;
+        dnr:usingStore _:store;
+    ]
+.
+
+<dotnetrdf:/pull> a dnr:HttpHandler ;
+    dnr:type "VDS.RDF.Server.SparqlQueryEndpoint" ;
+    dnr:queryProcessor [
+        a dnr:SparqlQueryProcessor ;
+        dnr:type "VDS.RDF.Query.Pull.PullQueryProcessor" ;
+        dnr:usingStore _:store;
+    ]
+.
+_:store a dnr:TripleStore ;
+    dnr:type "VDS.RDF.TripleStore" ;
+    dnr:usingGraph _:data ;
+.
+
+_:data a dnr:Graph ;
+    dnr:type "VDS.RDF.Graph" ;
+    dnr:fromFile "/home/kal/Projects/bsbmtools-v0.2/dataset.nt" ;
+.
