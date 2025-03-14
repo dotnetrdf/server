@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VDS.RDF.Configuration;
@@ -53,14 +54,14 @@ public static class DotNetRdfExtensions
     /// <summary>
     /// Load a service endpoint from the application configuration file and register it with the web application
     /// </summary>
-    /// <param name="app">The application to register the new endpoint with</param>
+    /// <param name="routeBuilder">The route builder to register the new endpoint with</param>
     /// <param name="configGraph">The RDF graph that contains the application configuration</param>
     /// <param name="serviceEndpointNode">The RDF node in <paramref name="configGraph"/> that defines the endpoint to be registered.</param>
-    private static void MapServiceEndpoint(WebApplication app, Graph configGraph, INode serviceEndpointNode)
+    private static void MapServiceEndpoint(IEndpointRouteBuilder routeBuilder, Graph configGraph, INode serviceEndpointNode)
     {
         if (ConfigurationLoader.LoadObject(configGraph, serviceEndpointNode) is IServiceEndpoint serviceEndpoint)
         {
-            serviceEndpoint.Register(app);
-        };
+            serviceEndpoint.Register(routeBuilder);
+        }
     }
 }

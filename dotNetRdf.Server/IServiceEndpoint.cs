@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace VDS.RDF.Server;
 
 public interface IServiceEndpoint
 {
-    void Register(WebApplication app);
+    void Register(IEndpointRouteBuilder routeBuilder);
 }

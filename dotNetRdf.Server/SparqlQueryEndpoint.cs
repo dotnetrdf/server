@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using VDS.RDF.Query;
@@ -11,10 +12,10 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
 {
     public string Path { get; } = path;
 
-    public void Register(WebApplication app)
+    public void Register(IEndpointRouteBuilder routeBuilder)
     {
-        var sparqlService = app.Services.GetRequiredService<ISparqlQueryService>();
-        app.MapGet(Path, async (ctx) =>
+        var sparqlService = routeBuilder.ServiceProvider.GetRequiredService<ISparqlQueryService>();
+        routeBuilder.MapGet(Path, async (ctx) =>
         {
             var query = ctx.Request.Query["query"];
             var defaultGraphUri = ctx.Request.Query["default-graph-uri"];
@@ -29,11 +30,11 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
             await sparqlService.ProcessQueryAsync(ctx, query[0]!, defaultGraphUri, namedGraphUri, queryProcessor);
         });
 
-        app.MapPost(Path, async (ctx) =>
+        routeBuilder.MapPost(Path, async (ctx) =>
         {
             var mediaType = ctx.Request.GetTypedHeaders().ContentType?.MediaType.Value;
             string query;
-            StringValues? defaultGraphUris = null, namedGraphUris = null;
+            StringValues? defaultGraphUris, namedGraphUris;
             
             switch (mediaType)
             {
