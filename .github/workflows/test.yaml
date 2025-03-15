@@ -1,0 +1,27 @@
+name: Tests
+on:
+  pull_request: 
+  push:
+    branches:
+      - main
+jobs:
+  unit-tests:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        framework:
+          ["net9.0"]
+        suite:
+          - dotNetRdf.Server.Tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Tests
+        run: dotnet test -c Release --framework ${{ matrix.framework }} --collect:"XPlat Code Coverage" Testing/${{matrix.suite}}
+      - name: Upload Code Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-windows ${{matrix.suite}} ${{matrix.framework}}
+          path: Testing\${{matrix.suite}}\TestResults\**\coverage.cobertura.xml
