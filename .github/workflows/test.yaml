@@ -19,9 +19,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Tests
-        run: dotnet test -c Release --framework ${{ matrix.framework }} --collect:"XPlat Code Coverage" Testing/${{matrix.suite}}
+        run: dotnet test -c Release --framework ${{ matrix.framework }} --collect:"XPlat Code Coverage" ${{matrix.suite}}
       - name: Upload Code Coverage
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-windows ${{matrix.suite}} ${{matrix.framework}}
-          path: Testing\${{matrix.suite}}\TestResults\**\coverage.cobertura.xml
+          path: ${{matrix.suite}}\TestResults\**\coverage.cobertura.xml
