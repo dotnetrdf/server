@@ -22,28 +22,36 @@ public class SparqlQueryService(IRdfResponseWriter responseWriter) : ISparqlQuer
             return;
         }
 
-        if (defaultGraphUri.Any())
+        try
         {
-            parsedQuery.ClearDefaultGraphs();
-            foreach (var defaultGraphName in defaultGraphUri)
+            if (defaultGraphUri.Count != 0)
             {
-                if (defaultGraphName != null)
+                parsedQuery.ClearDefaultGraphs();
+                foreach (var defaultGraphName in defaultGraphUri)
                 {
-                    parsedQuery.AddDefaultGraph(new UriNode(new Uri(defaultGraphName)));
+                    if (defaultGraphName != null)
+                    {
+                        parsedQuery.AddDefaultGraph(new UriNode(new Uri(defaultGraphName)));
+                    }
+                }
+            }
+
+            if (namedGraphUri.Count != 0)
+            {
+                parsedQuery.ClearNamedGraphs();
+                foreach (var namedGraphName in namedGraphUri)
+                {
+                    if (namedGraphName != null)
+                    {
+                        parsedQuery.AddNamedGraph(new UriNode(new Uri(namedGraphName)));
+                    }
                 }
             }
         }
-
-        if (namedGraphUri.Count != 0)
+        catch (UriFormatException)
         {
-            parsedQuery.ClearNamedGraphs();
-            foreach (var namedGraphName in namedGraphUri)
-            {
-                if (namedGraphName != null)
-                {
-                    parsedQuery.AddNamedGraph(new UriNode(new Uri(namedGraphName)));
-                }
-            }
+            ctx.Response.StatusCode = 400;
+            return;
         }
 
         try

@@ -5,9 +5,7 @@ namespace VDS.RDF.Server;
 
 public class ServerConfiguration : IObjectFactory
 {
-    private const string SparqlQueryEndpoint = "VDS.RDF.Server.SparqlQueryEndpoint",
-        PathProperty = ConfigurationLoader.ConfigurationNamespace + "path",
-        ProcessorProperty = ConfigurationLoader.ConfigurationNamespace + "processor";
+    private const string SparqlQueryEndpoint = "VDS.RDF.Server.SparqlQueryEndpoint";
     public bool TryLoadObject(IGraph g, INode objNode, Type targetType, out object? obj)
     {
         switch (targetType.FullName)

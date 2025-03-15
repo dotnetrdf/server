@@ -8,8 +8,20 @@ using VDS.RDF.Server.Services;
 
 namespace VDS.RDF.Server;
 
+/**
+ * <summary>
+ * A <see cref="IServiceEndpoint"/> that implements the SPARQL Protocol query operation.
+ * </summary>
+ * <para>
+ * The endpoint supports both GET and POST operations in accordance with section 2.1 of
+ * SPARQL 1.1 Protocol. (https://www.w3.org/TR/sparql11-protocol/)
+ * </para>
+ */
 public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcessor) : IServiceEndpoint
 {
+    /// <summary>
+    /// Get the server path that this endpoint responds on
+    /// </summary>
     public string Path { get; } = path;
 
     public void Register(IEndpointRouteBuilder routeBuilder)
