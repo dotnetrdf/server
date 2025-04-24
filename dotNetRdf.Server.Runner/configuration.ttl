@@ -30,5 +30,5 @@ _:store a dnr:TripleStore ;
 _:data a dnr:Graph ;
     dnr:type "VDS.RDF.Graph" ;
     # Replace this file reference with a local RDF file to load for querying
-    dnr:fromFile "/home/kal/Projects/bsbmtools-v0.2/dataset.nt" ;
+    dnr:fromFile "test.ttl" ;
 .

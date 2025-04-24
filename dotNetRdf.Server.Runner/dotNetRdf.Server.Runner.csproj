@@ -16,4 +16,10 @@
       <ProjectReference Include="..\dotNetRdf.Server\dotNetRdf.Server.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="test.ttl">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
