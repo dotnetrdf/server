@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using VDS.RDF.Parsing;
+using VDS.RDF.Query;
 using VDS.RDF.Update;
 using VDS.RDF.Update.Commands;
 
@@ -51,8 +52,18 @@ public class SparqlUpdateService : ISparqlUpdateService
                             return;
                         }
 
-                        userDefaultGraphs.ForEach(g => modifyCmd.AddUsingUri(new Uri(g!)));
-                        userNamedGraphs.ForEach(g => modifyCmd.AddUsingNamedUri(new Uri(g!)));
+                        try
+                        {
+                            userDefaultGraphs.ForEach(g => modifyCmd.AddUsingUri(new Uri(g!)));
+                            userNamedGraphs.ForEach(g => modifyCmd.AddUsingNamedUri(new Uri(g!)));
+                        }
+                        catch (UriFormatException)
+                        {
+                            ctx.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                            await ctx.Response.WriteAsync(
+                                "Invalid graph name in using-graph-uri or using-named-graph-uri parameter");
+                            return;
+                        }
                     }
                 }
             }
@@ -60,6 +71,11 @@ public class SparqlUpdateService : ISparqlUpdateService
             updateProcessor.ProcessCommandSet(cmdSet);
             updateProcessor.Flush();
             ctx.Response.StatusCode = (int)HttpStatusCode.OK;
+        }
+        catch (RdfQueryTimeoutException timeout)
+        {
+            ctx.Response.StatusCode = (int)HttpStatusCode.GatewayTimeout;
+            await ctx.Response.WriteAsync("SPARQL Update timed out");
         }
         catch (RdfException exception)
         {
