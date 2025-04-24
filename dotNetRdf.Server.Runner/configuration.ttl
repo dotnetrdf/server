@@ -20,6 +20,16 @@
     ]
 .
 
+# Define a SPARQL update endpoint
+<dotnetrdf:/update> a dnr:HttpHandler ;
+    dnr:type "VDS.RDF.Server.SparqlUpdateEndpoint" ;
+    dnr:updateProcessor [
+        a dnr:SparqlUpdateProcessor ;
+        dnr:type "VDS.RDF.Update.LeviathanUpdateProcessor" ;
+        dnr:usingStore _:store;
+    ]
+.
+
 # Both query endpoints query against this triple store
 _:store a dnr:TripleStore ;
     dnr:type "VDS.RDF.TripleStore" ;
