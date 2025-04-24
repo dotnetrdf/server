@@ -11,15 +11,15 @@ namespace dotNetRdf.Server.Tests.Services;
 public class SparqlQueryServiceTests
 {
     private readonly SparqlResultSet _emptyResultSet = new ();
-    private readonly Mock<ISparqlQueryProcessor> _succesfulQueryProcessorMock;
+    private readonly Mock<ISparqlQueryProcessor> _successfulQueryProcessorMock;
     private readonly Mock<ISparqlQueryProcessor> _failedQueryProcessorMock;
     private readonly Mock<ISparqlQueryProcessor> _timedOutQueryProcessorMock;
     private readonly HttpContext _httpContext;
 
     public SparqlQueryServiceTests()
     {
-        _succesfulQueryProcessorMock = new Mock<ISparqlQueryProcessor>();
-        _succesfulQueryProcessorMock.Setup(x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()))
+        _successfulQueryProcessorMock = new Mock<ISparqlQueryProcessor>();
+        _successfulQueryProcessorMock.Setup(x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()))
             .ReturnsAsync(_emptyResultSet);
         _failedQueryProcessorMock = new Mock<ISparqlQueryProcessor>();
         _failedQueryProcessorMock.Setup(x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()))
@@ -39,10 +39,10 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE { ?s ?p ?o }",
             new StringValues(),
             new StringValues(),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
 
         // Query processor should be called once
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x =>
                 x.ProcessQueryAsync(
                     It.Is<SparqlQuery>(query =>
@@ -63,9 +63,9 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE {?s ?p ?o",
             new StringValues(),
             new StringValues(),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
         // Query processor should not have been called
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()),
             Times.Never
         );
@@ -80,11 +80,11 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE {?s ?p ?o }",
             new StringValues(["http://example.com/g1", "http://example.com/g2"]),
             new StringValues(),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
         
         _httpContext.Response.StatusCode.Should().Be(200);
 
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x =>
                 x.ProcessQueryAsync(
                     It.Is<SparqlQuery>(query =>
@@ -105,9 +105,9 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE {?s ?p ?o }",
             new StringValues("bad"),
             new StringValues(),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
         // Query processor should not have been called
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()),
             Times.Never
         );
@@ -122,11 +122,11 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE {?s ?p ?o }",
             new StringValues(),
             new StringValues(["http://example.com/g1", "http://example.com/g2"]),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
         
         _httpContext.Response.StatusCode.Should().Be(200);
 
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x =>
                 x.ProcessQueryAsync(
                     It.Is<SparqlQuery>(query =>
@@ -147,9 +147,9 @@ public class SparqlQueryServiceTests
             "SELECT * WHERE {?s ?p ?o }",
             new StringValues("http://example.org/"),
             new StringValues("bad"),
-            _succesfulQueryProcessorMock.Object);
+            _successfulQueryProcessorMock.Object);
         // Query processor should not have been called
-        _succesfulQueryProcessorMock.Verify(
+        _successfulQueryProcessorMock.Verify(
             x => x.ProcessQueryAsync(It.IsAny<SparqlQuery>()),
             Times.Never
         );
