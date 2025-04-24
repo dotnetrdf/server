@@ -52,7 +52,7 @@ public class RdfResponseWriterTests
         ctx.Request.Headers["Accept"] = "application/svg+xml";
         var sut = new RdfResponseWriter();
         await sut.WriteSparqlResultSetAsync(ctx, _resultSet);
-        Assert.Equal(405, ctx.Response.StatusCode);
+        Assert.Equal(406, ctx.Response.StatusCode);
     }
 
     [Fact]

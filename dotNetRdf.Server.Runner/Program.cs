@@ -14,3 +14,5 @@ app.MapDotNetRdfEndpoints();
 Console.WriteLine(app.Urls.FirstOrDefault());
 
 app.Run();
+
+public partial class Program { }

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using VDS.RDF.Query;
@@ -11,7 +12,8 @@ public class RdfResponseWriter: IRdfResponseWriter
         var mimeTypeDef =  ctx.GetAcceptableMediaType(it => it.CanWriteSparqlResults);
         if (!mimeTypeDef.HasValue)
         {
-            ctx.Response.StatusCode = 405;
+            ctx.Response.StatusCode = (int)HttpStatusCode.NotAcceptable;
+            await ctx.Response.WriteAsync("No acceptable media type found for SPARQL results.");
             return;
         }
         ctx.Response.StatusCode = 200;
