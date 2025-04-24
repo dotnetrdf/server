@@ -5,7 +5,7 @@ on:
     branches:
       - main
 jobs:
-  unit-tests:
+  run-tests:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -13,6 +13,7 @@ jobs:
           ["net9.0"]
         suite:
           - dotNetRdf.Server.Tests
+          - dotNetRdf.Server.Runner.Tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
