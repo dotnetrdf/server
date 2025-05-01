@@ -44,7 +44,7 @@ public class SparqlQueryEndpoint(string path, ISparqlQueryProcessor queryProcess
 
         routeBuilder.MapPost(Path, async (ctx) =>
         {
-            var mediaType = ctx.Request.GetTypedHeaders().ContentType?.MediaType.Value;
+            var mediaType = ctx.Request.GetTypedHeaders().ContentType?.MediaType.Value?.ToLowerInvariant();
             string query;
             StringValues? defaultGraphUris, namedGraphUris;
             

@@ -95,8 +95,8 @@ public class SparqlQueryServiceTests
                 ),
             Times.Once
         );
-
     }
+
     [Fact]
     public async Task ItRespondsWith40OnInvalidDefaultGraphName()
     {
