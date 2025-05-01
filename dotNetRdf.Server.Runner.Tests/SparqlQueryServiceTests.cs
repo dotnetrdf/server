@@ -3,7 +3,8 @@ using FluentAssertions;
 
 namespace dotNetRdf.Server.Runner.Tests;
 
-public class SparqlQueryIntegrationTests : IClassFixture<WebApplicationFactoryFixture<Program>>
+[Collection("Web Application")]
+public class SparqlQueryIntegrationTests
 {
     private readonly HttpClient _client;
 

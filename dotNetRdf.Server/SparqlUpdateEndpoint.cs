@@ -20,11 +20,11 @@ public class SparqlUpdateEndpoint(string path, ISparqlUpdateProcessor updateProc
             if (ctx.Request.HasFormContentType)
             {
                 var form = await ctx.Request.ReadFormAsync();
-                update = form["query"].FirstOrDefault() ?? String.Empty;
+                update = form["update"].FirstOrDefault() ?? String.Empty;
                 usingGraphUris = form["using-graph-uri"];
                 usingNamedGraphUris = form["using-named-graph-uri"];
             }
-            else if (ctx.Request.ContentType == "application/sparql-update")
+            else if (ctx.Request.GetTypedHeaders().ContentType?.MediaType.Value?.ToLowerInvariant() == "application/sparql-update")
             {
                 update = await new StreamReader(ctx.Request.Body).ReadToEndAsync();
                 usingGraphUris = ctx.Request.Query["using-graph-uri"];
